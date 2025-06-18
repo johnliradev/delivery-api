@@ -13,3 +13,145 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+//Enums
+enum Role {
+  CUSTOMER
+  RESTAURANT
+  ADMIN
+}
+
+enum OrderStatus {
+  RECEIVED
+  PREPARING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELED
+}
+
+//Models
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  password_hash String
+  phone         String?
+  role          Role     @default(CUSTOMER)
+  createdAt     DateTime @default(now())
+
+  // Relações
+  restaurant Restaurant?
+  addresses  Address[]
+  orders     Order[]
+
+  @@map("users")
+}
+
+model Restaurant {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+
+  // Relação 1-para-1 com User
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+
+  // Outras relações
+  categories Category[]
+  products   Product[]
+  orders     Order[]
+
+  @@map("restaurants")
+}
+
+model Address {
+  id      String @id @default(cuid())
+  street  String
+  number  String
+  city    String
+  zipCode String
+
+  // Relação muitos-para-1 com User
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  // Outras relações
+  orders Order[]
+
+  @@map("addresses")
+}
+
+model Category {
+  id   String @id @default(cuid())
+  name String
+
+  // Relação muitos-para-1 com Restaurant
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+
+  //OUtras relações
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal @db.Decimal(10, 2)
+  available   Boolean @default(true)
+
+  // Relação muitos-para-1 
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  category     Category   @relation(fields: [categoryId], references: [id])
+  categoryId   String
+
+  //  Outras relações
+  orderItems OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  total     Decimal     @db.Decimal(10, 2)
+  status    OrderStatus @default(RECEIVED)
+  createdAt DateTime    @default(now())
+
+  // Relação com o Cliente
+  customer   User   @relation(fields: [customerId], references: [id])
+  customerId String
+
+  // Relação com o Restaurante
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+
+  // Relação com o Endereço de Entrega
+  deliveryAddress Address @relation(fields: [addressId], references: [id])
+  addressId       String
+
+  // OUtras relações
+  items OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id       String @id @default(cuid())
+  quantity Int
+
+  // Relação com o Pedido
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String
+
+  // Relação com o Produto
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  // Garante que um produto não pode ser adicionado duas vezes no mesmo pedido
+  @@unique([orderId, productId])
+  @@map("order_items")
+}
