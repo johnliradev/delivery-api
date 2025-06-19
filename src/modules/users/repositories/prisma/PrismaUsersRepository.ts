@@ -12,6 +12,14 @@ export const PrismaUsersRepository: IUsersRepository = {
     });
     return user;
   },
+  async findById(userId: string): Promise<User | null> {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    return user;
+  },
   async create(data: CreateUserRepositoryData): Promise<User> {
     const { name, email, passwordHash } = data;
     const user = await prisma.user.create({

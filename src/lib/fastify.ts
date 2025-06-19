@@ -12,9 +12,6 @@ export const app = fastify({
     },
   },
 });
-
-RegisterPlugins(app);
-
 app.decorate(
   "authenticate",
   async (request: FastifyRequest, reply: FastifyReply) => {
@@ -22,7 +19,8 @@ app.decorate(
       await request.jwtVerify();
     } catch (error) {
       app.log.error(error);
-      reply.status(401).send({ error: "Unauthorized" });
+      reply.status(401).send({ error: "Não autorizado" });
     }
   }
 );
+RegisterPlugins(app);

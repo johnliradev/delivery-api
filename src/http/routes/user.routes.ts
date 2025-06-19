@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { createUserController } from "../../modules/users/use-cases/create-user/create-user.controller";
+import { getProfileController } from "../../modules/users/use-cases/get-profile/get-profile.controller";
 export function userRouter(app: FastifyInstance) {
   app.post(
     "/",
@@ -20,4 +21,5 @@ export function userRouter(app: FastifyInstance) {
     },
     createUserController
   );
+  app.get("/me", { preHandler: [app.authenticate] }, getProfileController);
 }
