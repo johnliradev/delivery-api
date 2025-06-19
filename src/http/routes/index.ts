@@ -1,8 +1,12 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { userRouter } from "./user.routes";
+import { authRouter } from "./auth.route";
 export function Router(app: FastifyInstance) {
   app.register(userRouter, {
     prefix: "/users",
+  });
+  app.register(authRouter, {
+    prefix: "/session",
   });
   app.get(
     "/",

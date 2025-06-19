@@ -3,6 +3,8 @@ import cors from "@fastify/cors";
 import { Router } from "../routes/index";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
+import fastifyJwt from "@fastify/jwt";
+import { env } from "../../config/env";
 // Function to register plugins for app instance
 const swaggerOptions = {
   openapi: {
@@ -25,6 +27,10 @@ export async function RegisterPlugins(app: FastifyInstance) {
     origin: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
+  });
+  // Register JWT plugin
+  await app.register(fastifyJwt, {
+    secret: env.JWT_SECRET,
   });
   // Register Swagger plugin
   await app.register(swagger, swaggerOptions);

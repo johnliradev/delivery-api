@@ -1,4 +1,4 @@
-import fastify from "fastify";
+import fastify, { FastifyReply, FastifyRequest } from "fastify";
 import { RegisterPlugins } from "../http/plugins";
 
 export const app = fastify({
@@ -14,3 +14,15 @@ export const app = fastify({
 });
 
 RegisterPlugins(app);
+
+app.decorate(
+  "authenticate",
+  async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      await request.jwtVerify();
+    } catch (error) {
+      app.log.error(error);
+      reply.status(401).send({ error: "Unauthorized" });
+    }
+  }
+);
