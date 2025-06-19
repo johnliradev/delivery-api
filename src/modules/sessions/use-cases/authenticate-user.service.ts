@@ -12,10 +12,12 @@ export async function authenticateUserService({
 }> {
   const user = await PrismaUsersRepository.findByEmail(email);
   if (!user) {
+    app.log.error(`Tentativa de login falhou`);
     throw new Error("E-mail ou senha incorretos.");
   }
   const passwordMatch = await compare(password, user.password_hash);
   if (!passwordMatch) {
+    app.log.error(`Tentativa de login falhou`);
     throw new Error("E-mail ou senha incorretos.");
   }
 
