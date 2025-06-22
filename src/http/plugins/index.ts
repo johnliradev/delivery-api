@@ -5,6 +5,7 @@ import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import fastifyJwt from "@fastify/jwt";
 import { env } from "../../config/env";
+import { globalErrorHandler } from "../errorHandler";
 // Function to register plugins for app instance
 const swaggerOptions = {
   openapi: {
@@ -32,6 +33,8 @@ export async function RegisterPlugins(app: FastifyInstance) {
   await app.register(fastifyJwt, {
     secret: env.JWT_SECRET,
   });
+  // Register error handler
+  app.setErrorHandler(globalErrorHandler as any);
   // Register Swagger plugin
   await app.register(swagger, swaggerOptions);
   await app.register(swaggerUI, {

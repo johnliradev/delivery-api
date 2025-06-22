@@ -2,6 +2,7 @@ import { compare } from "bcryptjs";
 import { PrismaUsersRepository } from "../../users/repositories/prisma/PrismaUsersRepository";
 import { AuthenticateUserDTO } from "./authenticate-user.dto";
 import { app } from "../../../lib/fastify";
+import { createAppError } from "../../../error/AppError";
 
 export async function authenticateUserService({
   email,
@@ -13,12 +14,12 @@ export async function authenticateUserService({
   const user = await PrismaUsersRepository.findByEmail(email);
   if (!user) {
     app.log.error(`Tentativa de login falhou`);
-    throw new Error("E-mail ou senha incorretos.");
+    throw createAppError("E-mail ou senha incorretos.", 401);
   }
   const passwordMatch = await compare(password, user.password_hash);
   if (!passwordMatch) {
     app.log.error(`Tentativa de login falhou`);
-    throw new Error("E-mail ou senha incorretos.");
+    throw createAppError("E-mail ou senha incorretos.", 401);
   }
 
   const token = await app.jwt.sign(

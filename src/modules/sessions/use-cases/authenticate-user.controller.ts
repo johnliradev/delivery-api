@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { authenticateUserSchema } from "./authenticate-user.dto";
 import { authenticateUserService } from "./authenticate-user.service";
 import { app } from "../../../lib/fastify";
+import { createAppError } from "../../../error/AppError";
 
 export async function authenticateUserController(
   request: FastifyRequest,
@@ -10,10 +11,7 @@ export async function authenticateUserController(
   const parseData = authenticateUserSchema.safeParse(request.body);
   if (parseData.error) {
     app.log.error(`Erro ao autenticar usuário: ${parseData.error.message}`);
-    return reply.code(400).send({
-      message: "Erro de validação dos dados.",
-      error: parseData.error.flatten(),
-    });
+    throw createAppError("Erro de validação dos dados.", 400);
   }
   const { token, user } = await authenticateUserService(parseData.data);
   app.log.info(`Usuário autenticado com sucesso`);
