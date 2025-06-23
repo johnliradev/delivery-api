@@ -26,7 +26,7 @@ export async function RegisterPlugins(app: FastifyInstance) {
   // Register CORS plugin
   await app.register(cors, {
     origin: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   });
   // Register JWT plugin
