@@ -12,8 +12,8 @@ export async function getProfileService(userId: string): Promise<any> {
     id: user.id,
     name: user.name,
     email: user.email,
+    role: user.role,
     createdAt: user.createdAt,
   };
-  console.log(userProfile);
   return userProfile;
 }

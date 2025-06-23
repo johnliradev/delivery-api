@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { createUserController } from "../../modules/users/use-cases/create-user/create-user.controller";
 import { getProfileController } from "../../modules/users/use-cases/get-profile/get-profile.controller";
+import updateRoleController from "../../modules/users/use-cases/update-role/update-role.controller";
 export function userRouter(app: FastifyInstance) {
   app.post(
     "/",
@@ -69,6 +70,7 @@ export function userRouter(app: FastifyInstance) {
                   id: { type: "string", format: "uuid" },
                   name: { type: "string" },
                   email: { type: "string", format: "email" },
+                  role: { type: "string" },
                   createdAt: { type: "string", format: "date-time" },
                 },
               },
@@ -95,5 +97,58 @@ export function userRouter(app: FastifyInstance) {
       preHandler: [app.authenticate],
     },
     getProfileController
+  );
+  app.patch(
+    "/:id/role",
+    {
+      schema: {
+        summary: "Atualizar cargo do usuário",
+        description:
+          "Esta rota permite atualizar o cargo de um usuário específico. O cargo pode ser CUSTOMER, RESTAURANT ou ADMIN.",
+        tags: ["Users"],
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string" },
+          },
+          required: ["id"],
+        },
+        body: {
+          type: "object",
+          properties: {
+            role: {
+              type: "string",
+              enum: ["CUSTOMER", "RESTAURANT", "ADMIN"],
+            },
+          },
+          required: ["role"],
+        },
+        response: {
+          200: {
+            description: "Cargo atualizado com sucesso",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+          400: {
+            description: "Erro de validação dos dados",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+              errors: { type: "object" },
+            },
+          },
+          404: {
+            description: "Usuário não encontrado",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    updateRoleController
   );
 }

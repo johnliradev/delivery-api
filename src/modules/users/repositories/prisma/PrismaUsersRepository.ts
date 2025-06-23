@@ -1,5 +1,5 @@
 import { prisma } from "../../../../lib/prisma";
-import { User } from "../../../../generated/prisma";
+import { User, Role } from "../../../../generated/prisma";
 import { IUsersRepository } from "../IUsersRepository";
 import { CreateUserRepositoryData } from "../types/index";
 
@@ -28,6 +28,13 @@ export const PrismaUsersRepository: IUsersRepository = {
         email,
         password_hash: passwordHash,
       },
+    });
+    return user;
+  },
+  async updateUserRole(id: string, role: Role): Promise<User> {
+    const user = await prisma.user.update({
+      where: { id },
+      data: { role },
     });
     return user;
   },

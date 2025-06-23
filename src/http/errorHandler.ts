@@ -19,8 +19,12 @@ export const globalErrorHandler = (
       { issues: error.flatten().fieldErrors },
       "Erro de validação de dados recebidos."
     );
+
+    const errorMessage =
+      error.issues[0]?.message || "Erro de validação dos dados.";
+
     return reply.status(400).send({
-      message: "Erro de validação dos dados.",
+      message: errorMessage,
       errors: error.flatten(),
     });
   }
