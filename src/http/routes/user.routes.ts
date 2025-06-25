@@ -3,7 +3,12 @@ import { createUserController } from "../../modules/users/use-cases/create-user/
 import { getProfileController } from "../../modules/users/use-cases/get-profile/get-profile.controller";
 import updateRoleController from "../../modules/users/use-cases/update-role/update-role.controller";
 import updateProfileController from "../../modules/users/use-cases/update-profile/update-profile.controller";
+import { getAddressController } from "../../modules/addresses/use-cases/get-address/get-address.controller";
+import { createAddressController } from "../../modules/addresses/use-cases/create-address/create-address.controller";
+import { deleteAddressController } from "../../modules/addresses/use-cases/delete-address/delete-address.controller";
+import { updateAddressController } from "../../modules/addresses/use-cases/update-address/update-address.controller";
 export function userRouter(app: FastifyInstance) {
+  // Criar usuário
   app.post(
     "/",
     {
@@ -43,6 +48,44 @@ export function userRouter(app: FastifyInstance) {
     },
     createUserController
   );
+  // Criar endereço do usuário
+  app.post(
+    "/:id/address",
+    {
+      schema: {
+        summary: "Criar endereço do usuário",
+        description: "Cria um novo endereço para o usuário autenticado.",
+        tags: ["Addresses"],
+        headers: {
+          type: "object",
+          properties: {
+            Authorization: { type: "string" },
+          },
+          required: ["Authorization"],
+        },
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string", description: "ID do usuário" },
+          },
+          required: ["id"],
+        },
+        body: {
+          type: "object",
+          properties: {
+            street: { type: "string", description: "Nome da rua" },
+            number: { type: "string", description: "Número" },
+            city: { type: "string", description: "Cidade" },
+            zipCode: { type: "string", description: "CEP" },
+          },
+          required: ["street", "number", "city", "zipCode"],
+        },
+      },
+      preHandler: [app.authenticate],
+    },
+    createAddressController
+  );
+  // Obter perfil do usuário autenticado
   app.get(
     "/me",
     {
@@ -74,7 +117,29 @@ export function userRouter(app: FastifyInstance) {
                   phone: { type: "string" },
                   role: { type: "string" },
                   createdAt: { type: "string", format: "date-time" },
+                  address: {
+                    type: "array",
+                    nullable: true,
+                    items: {
+                      type: "object",
+                      properties: {
+                        id: { type: "string", format: "uuid" },
+                        street: { type: "string" },
+                        number: { type: "string" },
+                        city: { type: "string" },
+                        zipCode: { type: "string" },
+                      },
+                    },
+                  },
                 },
+                required: [
+                  "id",
+                  "name",
+                  "email",
+                  "role",
+                  "createdAt",
+                  "address",
+                ],
               },
             },
           },
@@ -100,6 +165,68 @@ export function userRouter(app: FastifyInstance) {
     },
     getProfileController
   );
+  // Obter endereço do usuário
+  app.get(
+    "/:id/address",
+    {
+      schema: {
+        summary: "Obter endereço do usuário",
+        description: "Retorna um endereço específico do usuário autenticado.",
+        tags: ["Addresses"],
+        headers: {
+          type: "object",
+          properties: {
+            Authorization: { type: "string" },
+          },
+          required: ["Authorization"],
+        },
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string", description: "ID do usuário" },
+            userId: { type: "string" },
+          },
+          required: ["id"],
+        },
+        response: {
+          200: {
+            description: "Resposta de sucesso com os dados do endereço.",
+            type: "object",
+            properties: {
+              address: {
+                type: "object",
+                properties: {
+                  id: { type: "string", format: "uuid" },
+                  street: { type: "string" },
+                  number: { type: "string" },
+                  city: { type: "string" },
+                  zipCode: { type: "string" },
+                },
+              },
+              userId: { type: "string" },
+            },
+          },
+          401: {
+            description: "Erro de autenticação",
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+          404: {
+            description: "Usuário não encontrado",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+      preHandler: [app.authenticate],
+    },
+    getAddressController
+  );
+  // Atualizar cargo do usuário
   app.patch(
     "/:id/role",
     {
@@ -154,6 +281,7 @@ export function userRouter(app: FastifyInstance) {
     },
     updateRoleController
   );
+  // Atualizar perfil do usuário
   app.patch(
     "/:id/profile",
     {
@@ -233,5 +361,135 @@ export function userRouter(app: FastifyInstance) {
       preHandler: [app.authenticate],
     },
     updateProfileController
+  );
+  // Deletar endereço do usuário
+  app.delete(
+    "/:id/address/:addressId",
+    {
+      schema: {
+        summary: "Deletar endereço do usuário",
+        description: "Remove um endereço específico do usuário autenticado.",
+        tags: ["Addresses"],
+        headers: {
+          type: "object",
+          properties: {
+            Authorization: { type: "string" },
+          },
+          required: ["Authorization"],
+        },
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string", description: "ID do usuário" },
+            addressId: { type: "string", description: "ID do endereço" },
+          },
+          required: ["id", "addressId"],
+        },
+        response: {
+          200: {
+            description: "Endereço deletado com sucesso",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+          401: {
+            description: "Erro de autenticação",
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+          404: {
+            description: "Endereço ou usuário não encontrado",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+      preHandler: [app.authenticate],
+    },
+    deleteAddressController
+  );
+  // Atualizar endereço do usuário
+  app.put(
+    "/:id/address/:addressId",
+    {
+      schema: {
+        summary: "Atualizar endereço do usuário",
+        description: "Permite que um usuário autenticado atualize um endereço.",
+        tags: ["Addresses"],
+        headers: {
+          type: "object",
+          properties: {
+            Authorization: { type: "string" },
+          },
+          required: ["Authorization"],
+        },
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string", description: "ID do usuário" },
+            addressId: { type: "string", description: "ID do endereço" },
+          },
+          required: ["id", "addressId"],
+        },
+        body: {
+          type: "object",
+          properties: {
+            street: {
+              type: "string",
+              description: "Nome da rua",
+              nullable: true,
+            },
+            number: { type: "string", description: "Número", nullable: true },
+            city: { type: "string", description: "Cidade", nullable: true },
+            zipCode: { type: "string", description: "CEP", nullable: true },
+          },
+          minProperties: 1,
+        },
+        response: {
+          200: {
+            description: "Endereço atualizado com sucesso",
+            type: "object",
+            properties: {
+              id: { type: "string", format: "uuid" },
+              street: { type: "string" },
+              number: { type: "string" },
+              city: { type: "string" },
+              zipCode: { type: "string" },
+              userId: { type: "string" },
+            },
+          },
+          400: {
+            description: "Erro de validação dos dados",
+            type: "object",
+            properties: {
+              statusCode: { type: "number" },
+              error: { type: "string" },
+              message: { type: "string" },
+            },
+          },
+          401: {
+            description: "Erro de autenticação",
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+          404: {
+            description: "Endereço ou usuário não encontrado",
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+      preHandler: [app.authenticate],
+    },
+    updateAddressController
   );
 }
