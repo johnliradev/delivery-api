@@ -13,6 +13,7 @@ export async function getProfileService(userId: string): Promise<any> {
     name: user.name,
     email: user.email,
     role: user.role,
+    phone: user.phone,
     createdAt: user.createdAt,
   };
   return userProfile;

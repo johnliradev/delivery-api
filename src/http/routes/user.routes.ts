@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { createUserController } from "../../modules/users/use-cases/create-user/create-user.controller";
 import { getProfileController } from "../../modules/users/use-cases/get-profile/get-profile.controller";
 import updateRoleController from "../../modules/users/use-cases/update-role/update-role.controller";
+import updateProfileController from "../../modules/users/use-cases/update-profile/update-profile.controller";
 export function userRouter(app: FastifyInstance) {
   app.post(
     "/",
@@ -70,6 +71,7 @@ export function userRouter(app: FastifyInstance) {
                   id: { type: "string", format: "uuid" },
                   name: { type: "string" },
                   email: { type: "string", format: "email" },
+                  phone: { type: "string" },
                   role: { type: "string" },
                   createdAt: { type: "string", format: "date-time" },
                 },
@@ -148,7 +150,88 @@ export function userRouter(app: FastifyInstance) {
           },
         },
       },
+      preHandler: [app.authenticate],
     },
     updateRoleController
+  );
+  app.patch(
+    "/:id/profile",
+    {
+      schema: {
+        summary: "Atualizar perfil do usuário",
+        description:
+          "Permite que um usuário autenticado atualize seu nome, e-mail e/ou telefone. O e-mail e o telefone devem ser únicos no sistema.",
+        tags: ["Users"],
+        params: {
+          type: "object",
+          properties: {
+            id: {
+              type: "string",
+              description: "ID do usuário a ser atualizado",
+            },
+          },
+          required: ["id"],
+        },
+        body: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string",
+              description: "Novo nome do usuário",
+              nullable: true,
+            },
+            email: {
+              type: "string",
+              format: "email",
+              description: "Novo e-mail do usuário",
+              nullable: true,
+            },
+            phone: {
+              type: "string",
+              description: "Novo telefone do usuário",
+              nullable: true,
+            },
+          },
+          description:
+            "Dados para atualização do perfil. Pelo menos um dos campos deve ser informado.",
+          minProperties: 1,
+        },
+        response: {
+          200: {
+            description: "Perfil atualizado com sucesso",
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              name: { type: "string" },
+              email: { type: "string" },
+              role: { type: "string" },
+              phone: { type: "string", nullable: true },
+              createdAt: { type: "string", format: "date-time" },
+            },
+          },
+          400: {
+            description:
+              "Erro de validação dos dados, e-mail ou telefone já em uso",
+            type: "object",
+            properties: {
+              statusCode: { type: "number" },
+              error: { type: "string" },
+              message: { type: "string" },
+            },
+          },
+          404: {
+            description: "Usuário não encontrado",
+            type: "object",
+            properties: {
+              statusCode: { type: "number" },
+              error: { type: "string" },
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+      preHandler: [app.authenticate],
+    },
+    updateProfileController
   );
 }

@@ -3,3 +3,8 @@ export type CreateUserRepositoryData = {
   email: string;
   passwordHash: string;
 };
+export type UpdateProfileRepositoryData = {
+  name?: string;
+  email?: string;
+  phone?: string;
+};

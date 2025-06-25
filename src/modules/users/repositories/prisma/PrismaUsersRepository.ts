@@ -1,7 +1,10 @@
 import { prisma } from "../../../../lib/prisma";
 import { User, Role } from "../../../../generated/prisma";
 import { IUsersRepository } from "../IUsersRepository";
-import { CreateUserRepositoryData } from "../types/index";
+import {
+  CreateUserRepositoryData,
+  UpdateProfileRepositoryData,
+} from "../types/index";
 
 export const PrismaUsersRepository: IUsersRepository = {
   async findByEmail(email: string): Promise<User | null> {
@@ -16,6 +19,14 @@ export const PrismaUsersRepository: IUsersRepository = {
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
+      },
+    });
+    return user;
+  },
+  async findByPhone(phone: string): Promise<User | null> {
+    const user = await prisma.user.findFirst({
+      where: {
+        phone,
       },
     });
     return user;
@@ -35,6 +46,17 @@ export const PrismaUsersRepository: IUsersRepository = {
     const user = await prisma.user.update({
       where: { id },
       data: { role },
+    });
+    return user;
+  },
+  async updateProfile(
+    id: string,
+    data: UpdateProfileRepositoryData
+  ): Promise<User> {
+    const { name, email, phone } = data;
+    const user = await prisma.user.update({
+      where: { id },
+      data: { name, email, phone },
     });
     return user;
   },
