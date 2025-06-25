@@ -4,9 +4,7 @@ import { PrismaAddressesRepository } from "../../repositories/prisma/prismaAddre
 import { app } from "../../../../lib/fastify";
 import { PrismaUsersRepository } from "../../../users/repositories/prisma/PrismaUsersRepository";
 
-export async function getAddressService(
-  userId: string
-): Promise<Address | null> {
+export async function getAddressService(userId: string): Promise<Address[]> {
   const user = await PrismaUsersRepository.findById(userId);
   if (!user) {
     app.log.error(`Usuário não encontrado ${userId}`);
@@ -14,7 +12,8 @@ export async function getAddressService(
   }
   const address = await PrismaAddressesRepository.findByUserId(userId);
   if (!address) {
-    return null;
+    app.log.error(`Endereço não encontrado ${userId}`);
+    throw createAppError("Endereço não encontrado", 404);
   }
   return address;
 }

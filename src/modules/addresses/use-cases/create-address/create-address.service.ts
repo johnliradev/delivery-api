@@ -2,9 +2,9 @@ import { PrismaAddressesRepository } from "../../repositories/prisma/prismaAddre
 import { PrismaUsersRepository } from "../../../users/repositories/prisma/PrismaUsersRepository";
 import { createAppError } from "../../../../error/AppError";
 import { app } from "../../../../lib/fastify";
-import { CreateAddressDTO } from "../../address.dto";
+import { AddressDTO } from "../../address.dto";
 
-export async function createAddressService(id: string, data: CreateAddressDTO) {
+export async function createAddressService(id: string, data: AddressDTO) {
   const user = await PrismaUsersRepository.findById(id);
   if (!user) {
     app.log.error(`Usuário não encontrado ${id}`);

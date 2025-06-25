@@ -8,4 +8,5 @@ export interface IUsersRepository {
   create(data: CreateUserRepositoryData): Promise<User>;
   updateUserRole(id: string, role: Role): Promise<User>;
   updateProfile(id: string, data: UpdateProfileRepositoryData): Promise<User>;
+  delete(id: string): Promise<void>;
 }

@@ -14,6 +14,9 @@ export default async function updateRoleController(
   const parseData = updateRoleSchema.parse(request.body);
 
   await updateRoleService(id, parseData.role as Role);
+  app.log.info(
+    `Controller: Cargo atualizado com sucesso - ID: ${id}, cargo: ${parseData.role}`
+  );
   return reply.status(200).send({
     message: "Cargo atualizado com sucesso",
   });

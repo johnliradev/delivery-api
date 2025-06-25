@@ -60,4 +60,9 @@ export const PrismaUsersRepository: IUsersRepository = {
     });
     return user;
   },
+  async delete(id: string): Promise<void> {
+    await prisma.user.delete({
+      where: { id },
+    });
+  },
 };

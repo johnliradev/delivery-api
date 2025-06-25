@@ -7,6 +7,7 @@ import { getAddressController } from "../../modules/addresses/use-cases/get-addr
 import { createAddressController } from "../../modules/addresses/use-cases/create-address/create-address.controller";
 import { deleteAddressController } from "../../modules/addresses/use-cases/delete-address/delete-address.controller";
 import { updateAddressController } from "../../modules/addresses/use-cases/update-address/update-address.controller";
+import { deleteUserController } from "../../modules/users/use-cases/delete-user/delete-user.controller";
 export function userRouter(app: FastifyInstance) {
   // Criar usuário
   app.post(
@@ -491,5 +492,32 @@ export function userRouter(app: FastifyInstance) {
       preHandler: [app.authenticate],
     },
     updateAddressController
+  );
+  // Deletar usuário
+  app.delete(
+    "/:id",
+    {
+      schema: {
+        summary: "Deletar usuário",
+        description: "Remove um usuário específico do sistema.",
+        tags: ["Users"],
+        headers: {
+          type: "object",
+          properties: {
+            Authorization: { type: "string" },
+          },
+          required: ["Authorization"],
+        },
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string", description: "ID do usuário" },
+          },
+          required: ["id"],
+        },
+      },
+      preHandler: [app.authenticate],
+    },
+    deleteUserController
   );
 }

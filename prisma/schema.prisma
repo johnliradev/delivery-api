@@ -73,7 +73,7 @@ model Address {
   zipCode String
 
   // Relação muitos-para-1 com User
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   // Outras relações

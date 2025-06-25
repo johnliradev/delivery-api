@@ -1,10 +1,14 @@
 import { createAppError } from "../../../../error/AppError";
 import { PrismaUsersRepository } from "../../repositories/prisma/PrismaUsersRepository";
 import { UpdateProfileDTO } from "./update-profile.dto";
+import { app } from "../../../../lib/fastify";
 
 export async function updateProfileService(id: string, data: UpdateProfileDTO) {
   const user = await PrismaUsersRepository.findById(id);
   if (!user) {
+    app.log.error(
+      `Erro ao atualizar perfil: Usuário não encontrado - ID: ${id}`
+    );
     throw createAppError("Usuário não encontrado", 404);
   }
   if (data.email) {
@@ -12,6 +16,9 @@ export async function updateProfileService(id: string, data: UpdateProfileDTO) {
       data.email
     );
     if (userWithSameEmail) {
+      app.log.error(
+        `Erro ao atualizar perfil: E-mail já em uso - ID: ${id}, email: ${data.email}`
+      );
       throw createAppError("E-mail já em uso", 400);
     }
   }
@@ -20,9 +27,13 @@ export async function updateProfileService(id: string, data: UpdateProfileDTO) {
       data.phone
     );
     if (userWithSamePhone) {
+      app.log.error(
+        `Erro ao atualizar perfil: Telefone já em uso - ID: ${id}, phone: ${data.phone}`
+      );
       throw createAppError("Telefone já em uso", 400);
     }
   }
   const updatedUser = await PrismaUsersRepository.updateProfile(id, data);
+  app.log.info(`Perfil atualizado com sucesso - ID: ${id}`);
   return updatedUser;
 }
