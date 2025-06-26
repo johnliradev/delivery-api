@@ -67,9 +67,11 @@ model Restaurant {
 
 model Address {
   id      String @id @default(cuid())
+  name    String
   street  String
   number  String
   city    String
+  state   String
   zipCode String
 
   // Relação muitos-para-1 com User

@@ -1,6 +1,10 @@
 import { z } from "zod";
 
 export const addressSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Nome do endereço é obrigatório")
+    .max(255, "Nome deve ter no máximo 255 caracteres"),
   street: z
     .string()
     .min(1, "Rua é obrigatória")
@@ -13,6 +17,10 @@ export const addressSchema = z.object({
     .string()
     .min(1, "Cidade é obrigatória")
     .max(255, "Cidade deve ter no máximo 255 caracteres"),
+  state: z
+    .string()
+    .min(1, "Estado é obrigatório")
+    .max(255, "Estado deve ter no máximo 255 caracteres"),
   zipCode: z
     .string()
     .min(1, "CEP é obrigatório")

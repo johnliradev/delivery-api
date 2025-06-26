@@ -15,7 +15,7 @@ export async function updateProfileService(id: string, data: UpdateProfileDTO) {
     const userWithSameEmail = await PrismaUsersRepository.findByEmail(
       data.email
     );
-    if (userWithSameEmail) {
+    if (userWithSameEmail && userWithSameEmail.id !== id) {
       app.log.error(
         `Erro ao atualizar perfil: E-mail já em uso - ID: ${id}, email: ${data.email}`
       );
@@ -26,7 +26,7 @@ export async function updateProfileService(id: string, data: UpdateProfileDTO) {
     const userWithSamePhone = await PrismaUsersRepository.findByPhone(
       data.phone
     );
-    if (userWithSamePhone) {
+    if (userWithSamePhone && userWithSamePhone.id !== id) {
       app.log.error(
         `Erro ao atualizar perfil: Telefone já em uso - ID: ${id}, phone: ${data.phone}`
       );

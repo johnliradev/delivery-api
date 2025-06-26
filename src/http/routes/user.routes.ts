@@ -74,12 +74,14 @@ export function userRouter(app: FastifyInstance) {
         body: {
           type: "object",
           properties: {
+            name: { type: "string", description: "Nome do endereço" },
             street: { type: "string", description: "Nome da rua" },
             number: { type: "string", description: "Número" },
             city: { type: "string", description: "Cidade" },
+            state: { type: "string", description: "Estado" },
             zipCode: { type: "string", description: "CEP" },
           },
-          required: ["street", "number", "city", "zipCode"],
+          required: ["name", "street", "number", "city", "state", "zipCode"],
         },
       },
       preHandler: [app.authenticate],
@@ -125,6 +127,8 @@ export function userRouter(app: FastifyInstance) {
                       type: "object",
                       properties: {
                         id: { type: "string", format: "uuid" },
+                        name: { type: "string" },
+                        state: { type: "string" },
                         street: { type: "string" },
                         number: { type: "string" },
                         city: { type: "string" },
@@ -440,6 +444,7 @@ export function userRouter(app: FastifyInstance) {
         body: {
           type: "object",
           properties: {
+            name: { type: "string", description: "Nome do endereço" },
             street: {
               type: "string",
               description: "Nome da rua",
@@ -447,6 +452,7 @@ export function userRouter(app: FastifyInstance) {
             },
             number: { type: "string", description: "Número", nullable: true },
             city: { type: "string", description: "Cidade", nullable: true },
+            state: { type: "string", description: "Estado", nullable: true },
             zipCode: { type: "string", description: "CEP", nullable: true },
           },
           minProperties: 1,

@@ -8,12 +8,16 @@ export async function createAddressController(
   reply: FastifyReply
 ) {
   const { id } = request.params as { id: string };
-  const { street, number, city, zipCode } = addressSchema.parse(request.body);
+  const { name, street, number, city, state, zipCode } = addressSchema.parse(
+    request.body
+  );
 
   await createAddressService(id, {
+    name,
     street,
     number,
     city,
+    state,
     zipCode,
   });
   app.log.info(`Controller: Endereço criado com sucesso - UserID: ${id}`);

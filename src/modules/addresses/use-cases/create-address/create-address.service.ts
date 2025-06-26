@@ -12,9 +12,11 @@ export async function createAddressService(id: string, data: AddressDTO) {
   }
   const address = await PrismaAddressesRepository.create({
     userId: id,
+    name: data.name,
     street: data.street,
     number: data.number,
     city: data.city,
+    state: data.state,
     zipCode: data.zipCode,
   });
   return address;
